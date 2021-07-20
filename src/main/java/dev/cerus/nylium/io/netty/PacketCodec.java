@@ -5,12 +5,19 @@ import dev.cerus.nylium.io.packet.Packet;
 import dev.cerus.nylium.io.packet.PacketIn;
 import dev.cerus.nylium.io.packet.PacketOut;
 import dev.cerus.nylium.io.packet.PacketRegistry;
+import dev.cerus.nylium.io.session.PlayerSessionController;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 import java.util.List;
 
 public class PacketCodec extends ByteToMessageCodec<Packet> {
+
+    private final PlayerSessionController playerSessionController;
+
+    public PacketCodec(final PlayerSessionController playerSessionController) {
+        this.playerSessionController = playerSessionController;
+    }
 
     @Override
     protected void encode(final ChannelHandlerContext ctx, final Packet msg, final ByteBuf out) throws Exception {
@@ -29,7 +36,11 @@ public class PacketCodec extends ByteToMessageCodec<Packet> {
         final int id = IOUtils.readVarInt(in);
 
         // Attempt to read packet
-        final PacketIn packet = PacketRegistry.readPacket(id, len - IOUtils.getVarIntSize(len), in);
+        final PacketIn packet = PacketRegistry.readPacket(new PacketRegistry.PacketReadingContext(
+                id,
+                len - IOUtils.getVarIntSize(len),
+                this.playerSessionController.getByChId(ctx.channel().id())
+        ), in);
         if (packet == null) {
             throw new NullPointerException("Packet " + id + " not found");
         }

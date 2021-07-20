@@ -8,6 +8,7 @@ import dev.cerus.nylium.event.implementation.PacketProcessEvent;
 import dev.cerus.nylium.event.implementation.PacketReceivedEvent;
 import dev.cerus.nylium.io.packet.PacketIn;
 import dev.cerus.nylium.io.packet.implementation.HandshakePacketIn;
+import dev.cerus.nylium.io.packet.implementation.LoginStartPacketIn;
 import dev.cerus.nylium.io.packet.implementation.PingPacketIn;
 import dev.cerus.nylium.io.packet.implementation.PongPacketOut;
 import dev.cerus.nylium.io.packet.implementation.RequestPacketIn;
@@ -36,7 +37,13 @@ public class LoginListener {
             this.handleRequestPacket(event.getSession(), (RequestPacketIn) packet);
         } else if (packet instanceof PingPacketIn) {
             event.getSession().sendPacket(new PongPacketOut(((PingPacketIn) packet).getIdentifier()));
+        } else if (packet instanceof LoginStartPacketIn) {
+            this.handleLoginStartPacket(event.getSession(), (LoginStartPacketIn) packet);
         }
+    }
+
+    private void handleLoginStartPacket(final PlayerSession session, final LoginStartPacketIn packet) {
+        session.getGameProfile().setUsername(packet.getUsername());
     }
 
     private void handleRequestPacket(final PlayerSession session, final RequestPacketIn packet) {
@@ -82,6 +89,7 @@ public class LoginListener {
         } else if (packet.getNextState() == 2) {
             // Login
             // TODO
+            session.setState(PlayerSession.SessionState.LOGIN);
         }
     }
 

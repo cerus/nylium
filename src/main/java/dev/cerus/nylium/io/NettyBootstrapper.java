@@ -66,7 +66,7 @@ public class NettyBootstrapper {
                             // Length prepender prepends the packet length on outgoing packets
                             ch.pipeline().addLast("lengthPrepender", new PacketLengthPrepender());
                             // Packet codec transforms bytes into packet instances
-                            ch.pipeline().addLast("codec", new PacketCodec());
+                            ch.pipeline().addLast("codec", new PacketCodec(NettyBootstrapper.this.sessionController));
                             // The last handler takes the end result and distributes it using the event bus
                             ch.pipeline().addLast("handler", new SimpleChannelInboundHandler<Packet>() {
                                 @Override
