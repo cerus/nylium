@@ -15,19 +15,15 @@ public class FrameSplitter extends ByteToMessageCodec<ByteBuf> {
 
     @Override
     protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) throws Exception {
-        final int i = 0;
         do {
+            // Get packet length
             final int len = IOUtils.peekVarInt(in);
             if (len > in.readableBytes()) {
                 throw new IllegalStateException(len + " > " + in.readableBytes());
             }
 
+            // Read the bytes that are part of this frame and add them to the result
             final ByteBuf byteBuf = in.readBytes(len + IOUtils.getVarIntSize(len));
-
-            final byte[] arr = new byte[byteBuf.readableBytes()];
-            byteBuf.getBytes(byteBuf.readerIndex(), arr);
-
-
             out.add(byteBuf.retain());
         } while (in.readableBytes() > 0);
     }

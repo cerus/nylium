@@ -1,7 +1,6 @@
 package dev.cerus.nylium.io;
 
 import io.netty.buffer.ByteBuf;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 public class IOUtils {
@@ -9,6 +8,13 @@ public class IOUtils {
     private IOUtils() {
     }
 
+    /**
+     * Reads a string from a buffer
+     *
+     * @param byteBuf The buffer
+     *
+     * @return A string
+     */
     public static String readString(final ByteBuf byteBuf) {
         final int len = readVarInt(byteBuf);
         final byte[] bytes = new byte[len];
@@ -16,24 +22,12 @@ public class IOUtils {
         return new String(bytes);
     }
 
-    public static int readVarInt(final ByteBuffer byteBuf) {
-        int decodedInt = 0;
-        int bitOffset = 0;
-        byte currentByte;
-        do {
-            currentByte = byteBuf.get();
-            decodedInt |= (currentByte & 0b01111111) << bitOffset;
-
-            if (bitOffset == 35) {
-                throw new RuntimeException("VarInt is too big");
-            }
-
-            bitOffset += 7;
-        } while ((currentByte & 0b10000000) != 0);
-
-        return decodedInt;
-    }
-
+    /**
+     * Writes a var int to a buffer
+     *
+     * @param byteBuffer The buffer
+     * @param value      The var int
+     */
     public static void writeVarInt(final ByteBuf byteBuffer, int value) {
         do {
             byte currentByte = (byte) (value & 0b01111111);
@@ -48,12 +42,24 @@ public class IOUtils {
         } while (value != 0);
     }
 
+    /**
+     * Writes a string to the provided buffer
+     *
+     * @param byteBuf The buffer
+     * @param s       The string
+     */
     public static void writeString(final ByteBuf byteBuf, final String s) {
         writeVarInt(byteBuf, s.length());
         byteBuf.writeBytes(s.getBytes(StandardCharsets.UTF_8));
     }
 
-
+    /**
+     * Reads a var int from the buffer
+     *
+     * @param byteBuf The buffer
+     *
+     * @return A var int
+     */
     public static int readVarInt(final ByteBuf byteBuf) {
         int decodedInt = 0;
         int bitOffset = 0;
@@ -72,6 +78,13 @@ public class IOUtils {
         return decodedInt;
     }
 
+    /**
+     * Same as {@link IOUtils#readVarInt(ByteBuf)} but does not increment the read counter
+     *
+     * @param byteBuf The buffer
+     *
+     * @return A var int
+     */
     public static int peekVarInt(final ByteBuf byteBuf) {
         int decodedInt = 0;
         int bitOffset = 0;
@@ -91,6 +104,15 @@ public class IOUtils {
         return decodedInt;
     }
 
+    /**
+     * Gets the size in bytes for the provided var int
+     * <p>
+     * Source: https://github.com/Steveice10/PacketLib/blob/master/src/main/java/com/github/steveice10/packetlib/packet/DefaultPacketHeader.java#L23
+     *
+     * @param varInt The var int
+     *
+     * @return The size in bytes
+     */
     public static int getVarIntSize(final int varInt) {
         if ((varInt & -128) == 0) {
             return 1;
@@ -104,4 +126,5 @@ public class IOUtils {
             return 5;
         }
     }
+
 }

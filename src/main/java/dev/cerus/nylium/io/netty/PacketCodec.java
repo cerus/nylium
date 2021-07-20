@@ -18,22 +18,23 @@ public class PacketCodec extends ByteToMessageCodec<Packet> {
             throw new IllegalStateException("Can only encode PacketOut");
         }
 
+        // Write packet
         ((PacketOut) msg).write(out);
     }
 
     @Override
     protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) throws Exception {
-        final byte[] arr = new byte[in.readableBytes()];
-        in.getBytes(in.readerIndex(), arr);
-
+        // Read packet length and packet id
         final int len = IOUtils.readVarInt(in);
         final int id = IOUtils.readVarInt(in);
 
+        // Attempt to read packet
         final PacketIn packet = PacketRegistry.readPacket(id, len - IOUtils.getVarIntSize(len), in);
         if (packet == null) {
             throw new NullPointerException("Packet " + id + " not found");
         }
 
+        // Add to result
         out.add(packet);
     }
 

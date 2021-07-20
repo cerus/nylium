@@ -9,6 +9,7 @@ public class PacketLengthPrepender extends MessageToByteEncoder<ByteBuf> {
 
     @Override
     protected void encode(final ChannelHandlerContext ctx, final ByteBuf msg, final ByteBuf out) throws Exception {
+        // Prepend length
         final int len = msg.readableBytes();
         IOUtils.writeVarInt(out, len);
         out.writeBytes(msg);
