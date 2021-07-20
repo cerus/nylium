@@ -58,7 +58,7 @@ public class NettyBootstrapper {
             final ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<SocketChannel>() { // (4)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(final SocketChannel ch) throws Exception {
                             // Frame splitter is responsible for breaking down the stream into packets
