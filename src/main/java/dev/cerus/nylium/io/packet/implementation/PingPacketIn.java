@@ -1,0 +1,26 @@
+package dev.cerus.nylium.io.packet.implementation;
+
+import dev.cerus.nylium.io.packet.PacketIn;
+import io.netty.buffer.ByteBuf;
+
+/**
+ * 0x01 https://wiki.vg/Server_List_Ping#Ping
+ */
+public class PingPacketIn extends PacketIn {
+
+    private long identifier;
+
+    public PingPacketIn(final ByteBuf byteBuffer) {
+        super(byteBuffer);
+    }
+
+    @Override
+    protected void read(final ByteBuf byteBuffer) {
+        this.identifier = byteBuffer.readLong();
+    }
+
+    public long getIdentifier() {
+        return this.identifier;
+    }
+
+}
