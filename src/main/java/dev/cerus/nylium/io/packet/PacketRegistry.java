@@ -1,5 +1,6 @@
 package dev.cerus.nylium.io.packet;
 
+import dev.cerus.nylium.io.packet.implementation.EncryptionResponsePacketIn;
 import dev.cerus.nylium.io.packet.implementation.HandshakePacketIn;
 import dev.cerus.nylium.io.packet.implementation.LoginStartPacketIn;
 import dev.cerus.nylium.io.packet.implementation.PingPacketIn;
@@ -20,9 +21,12 @@ public class PacketRegistry {
             this.put((context) -> context.id == 0x00 && context.length > 0
                     && context.session.getState() != PlayerSession.SessionState.LOGIN, HandshakePacketIn::new);
             this.put((context) -> context.id == 0x00 && context.length == 0, RequestPacketIn::new);
-            this.put((context) -> context.id == 0x01, PingPacketIn::new);
+            this.put((context) -> context.id == 0x01
+                    && context.session.getState() != PlayerSession.SessionState.ENCRYPTING, PingPacketIn::new);
             this.put((context) -> context.id == 0x00 && context.length > 0
                     && context.session.getState() == PlayerSession.SessionState.LOGIN, LoginStartPacketIn::new);
+            this.put((context) -> context.id == 0x01
+                    && context.session.getState() == PlayerSession.SessionState.ENCRYPTING, EncryptionResponsePacketIn::new);
         }
     };
 

@@ -1,11 +1,41 @@
 package dev.cerus.nylium.io;
 
+import dev.cerus.simplenbt.tag.SimpleNbtUtil;
+import dev.cerus.simplenbt.tag.Tag;
 import io.netty.buffer.ByteBuf;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 public class IOUtils {
 
     private IOUtils() {
+    }
+
+    public static void writeNbt(final ByteBuf byteBuf, final Tag<?> tag, final boolean name, final boolean zip) {
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try {
+            if (zip) {
+                SimpleNbtUtil.writeAndCompressTag(tag, outputStream, name);
+            } else {
+                SimpleNbtUtil.writeTag(tag, outputStream, name);
+            }
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+        byteBuf.writeBytes(outputStream.toByteArray());
+    }
+
+    public static UUID readUuid(final ByteBuf byteBuf) {
+        final long mostSig = byteBuf.readLong();
+        final long leastSig = byteBuf.readLong();
+        return new UUID(mostSig, leastSig);
+    }
+
+    public static void writeUuid(final ByteBuf byteBuf, final UUID uuid) {
+        byteBuf.writeLong(uuid.getMostSignificantBits());
+        byteBuf.writeLong(uuid.getLeastSignificantBits());
     }
 
     /**

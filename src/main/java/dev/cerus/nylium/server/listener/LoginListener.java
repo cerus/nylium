@@ -7,14 +7,24 @@ import dev.cerus.nylium.event.Subscribe;
 import dev.cerus.nylium.event.implementation.PacketProcessEvent;
 import dev.cerus.nylium.event.implementation.PacketReceivedEvent;
 import dev.cerus.nylium.io.packet.PacketIn;
+import dev.cerus.nylium.io.packet.implementation.DisconnectPacketOut;
+import dev.cerus.nylium.io.packet.implementation.EncryptionRequestPacketOut;
+import dev.cerus.nylium.io.packet.implementation.EncryptionResponsePacketIn;
 import dev.cerus.nylium.io.packet.implementation.HandshakePacketIn;
+import dev.cerus.nylium.io.packet.implementation.JoinGamePacketOut;
 import dev.cerus.nylium.io.packet.implementation.LoginStartPacketIn;
+import dev.cerus.nylium.io.packet.implementation.LoginSuccessPacketOut;
 import dev.cerus.nylium.io.packet.implementation.PingPacketIn;
 import dev.cerus.nylium.io.packet.implementation.PongPacketOut;
 import dev.cerus.nylium.io.packet.implementation.RequestPacketIn;
 import dev.cerus.nylium.io.packet.implementation.ResponsePacketOut;
 import dev.cerus.nylium.io.session.PlayerSession;
+import dev.cerus.nylium.mojang.MojangApiWrapper;
+import dev.cerus.nylium.server.key.NamespacedKey;
+import dev.cerus.simplenbt.tag.TagCompound;
+import java.util.Arrays;
 import java.util.UUID;
+import java.util.stream.StreamSupport;
 
 /**
  * Handles the login process
@@ -39,11 +49,81 @@ public class LoginListener {
             event.getSession().sendPacket(new PongPacketOut(((PingPacketIn) packet).getIdentifier()));
         } else if (packet instanceof LoginStartPacketIn) {
             this.handleLoginStartPacket(event.getSession(), (LoginStartPacketIn) packet);
+        } else if (packet instanceof EncryptionResponsePacketIn) {
+            this.handleEncryptionResponsePacket(event.getSession(), (EncryptionResponsePacketIn) packet);
         }
+    }
+
+    private void handleEncryptionResponsePacket(final PlayerSession session, final EncryptionResponsePacketIn packet) {
+        final byte[] decryptedVerifyToken;
+        final byte[] decryptedSharedSecret;
+        try {
+            decryptedVerifyToken = session.getEncryptionContainer().decryptExchange(packet.getVerifyToken());
+            decryptedSharedSecret = session.getEncryptionContainer().decryptExchange(packet.getSharedSecret());
+        } catch (final Exception e) {
+            e.printStackTrace();
+            session.getContext().close();
+            return;
+        }
+
+        if (!Arrays.equals(decryptedVerifyToken, session.getEncryptionContainer().getVerifyToken())) {
+            session.getContext().close();
+            return;
+        }
+
+        try {
+            session.getEncryptionContainer().initCommon(decryptedSharedSecret);
+            final PlayerSession.GameProfile gameProfile = session.getGameProfile();
+
+            final JsonObject jsonObject = MojangApiWrapper.hasJoined(gameProfile.getUsername(),
+                    session.getEncryptionContainer().getHash());
+
+            gameProfile.setUsername(jsonObject.get("name").getAsString());
+            gameProfile.setId(UUID.fromString(jsonObject.get("id").getAsString()
+                    .replaceFirst("(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5")));
+            StreamSupport.stream(jsonObject.get("properties").getAsJsonArray().spliterator(), false)
+                    .map(jsonElement -> {
+                        final JsonObject obj = jsonElement.getAsJsonObject();
+                        return new PlayerSession.GameProfile.Property(
+                                obj.get("name").getAsString(),
+                                obj.get("value").getAsString(),
+                                obj.has("signature") ? obj.get("signature").getAsString() : null
+                        );
+                    })
+                    .forEach(property -> gameProfile.getProperties().add(property));
+        } catch (final Exception e) {
+            e.printStackTrace();
+            session.getContext().close();
+            return;
+        }
+
+        session.setEncrypted(true);
+        session.setState(PlayerSession.SessionState.PLAY);
+        session.sendPacket(new LoginSuccessPacketOut(session.getGameProfile().getId(), session.getGameProfile().getUsername()));
+        session.sendPacket(new JoinGamePacketOut(
+                0,
+                false,
+                (byte) 0,
+                (byte) -1,
+                new NamespacedKey[] {NamespacedKey.def("affe")},
+                TagCompound.createRootTag(),
+                TagCompound.createRootTag(),
+                NamespacedKey.def("affe"),
+                1337L,
+                1337,
+                2,
+                false,
+                true,
+                false,
+                false
+        ));
+        session.sendPacket(new DisconnectPacketOut(true));
     }
 
     private void handleLoginStartPacket(final PlayerSession session, final LoginStartPacketIn packet) {
         session.getGameProfile().setUsername(packet.getUsername());
+        session.setState(PlayerSession.SessionState.ENCRYPTING);
+        session.sendPacket(new EncryptionRequestPacketOut(session.getEncryptionContainer()));
     }
 
     private void handleRequestPacket(final PlayerSession session, final RequestPacketIn packet) {

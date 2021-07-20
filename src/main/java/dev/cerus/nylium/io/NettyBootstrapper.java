@@ -4,6 +4,7 @@ import dev.cerus.nylium.event.EventBus;
 import dev.cerus.nylium.event.implementation.PacketReceivedEvent;
 import dev.cerus.nylium.io.netty.FrameSplitter;
 import dev.cerus.nylium.io.netty.PacketCodec;
+import dev.cerus.nylium.io.netty.PacketEncryptor;
 import dev.cerus.nylium.io.netty.PacketLengthPrepender;
 import dev.cerus.nylium.io.packet.Packet;
 import dev.cerus.nylium.io.packet.PacketIn;
@@ -61,6 +62,7 @@ public class NettyBootstrapper {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(final SocketChannel ch) throws Exception {
+                            ch.pipeline().addLast("encryptor", new PacketEncryptor(NettyBootstrapper.this.sessionController));
                             // Frame splitter is responsible for breaking down the stream into packets
                             ch.pipeline().addLast("splitter", new FrameSplitter());
                             // Length prepender prepends the packet length on outgoing packets
@@ -86,8 +88,14 @@ public class NettyBootstrapper {
                                         throw new IllegalStateException("Received a packet that is not a PacketIn");
                                     }
 
+                                    System.out.println(msg.getClass().getSimpleName());
                                     final PlayerSession session = NettyBootstrapper.this.sessionController.getByChId(ctx.channel().id());
                                     NettyBootstrapper.this.eventBus.callEvent(new PacketReceivedEvent(session, (PacketIn) msg));
+                                }
+
+                                @Override
+                                public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+                                    cause.printStackTrace();
                                 }
                             });
                         }
