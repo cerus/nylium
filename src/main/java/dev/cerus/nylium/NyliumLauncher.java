@@ -5,11 +5,13 @@ import dev.cerus.nylium.io.NettyBootstrapper;
 import dev.cerus.nylium.io.session.PlayerSessionController;
 import dev.cerus.nylium.server.NyliumServer;
 import dev.cerus.nylium.server.NyliumTicker;
+import dev.cerus.nylium.server.dimension.DimensionCodec;
 import dev.cerus.nylium.server.listener.EncryptionListener;
 import dev.cerus.nylium.server.listener.LoginListener;
 import dev.cerus.nylium.server.listener.PingListener;
 import dev.cerus.nylium.server.listener.SettingsListener;
 import dev.cerus.nylium.server.tick.KeepAliveTickable;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Formatter;
@@ -44,6 +46,16 @@ public class NyliumLauncher {
         // Set thread name, print our brand
         Thread.currentThread().setName("Server");
         printBrand();
+
+        LOGGER.info("Loading resources");
+
+        try {
+            DimensionCodec.initialize();
+        } catch (final IOException e) {
+            e.printStackTrace();
+            LOGGER.severe("Failed to load dimension codec");
+            return;
+        }
 
         // Create the event bus and add important listeners
         final EventBus eventBus = new EventBus();

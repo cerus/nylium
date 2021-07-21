@@ -7,12 +7,15 @@ import dev.cerus.nylium.event.implementation.PacketProcessEvent;
 import dev.cerus.nylium.event.implementation.PacketReceivedEvent;
 import dev.cerus.nylium.io.packet.PacketIn;
 import dev.cerus.nylium.io.packet.implementation.EncryptionResponsePacketIn;
+import dev.cerus.nylium.io.packet.implementation.JoinGamePacketOut;
 import dev.cerus.nylium.io.packet.implementation.LoginSuccessPacketOut;
 import dev.cerus.nylium.io.session.PlayerSession;
 import dev.cerus.nylium.mojang.MojangApiWrapper;
 import dev.cerus.nylium.server.chat.ChatColor;
 import dev.cerus.nylium.server.chat.ChatComponentStyle;
 import dev.cerus.nylium.server.chat.StringComponent;
+import dev.cerus.nylium.server.dimension.DimensionCodec;
+import dev.cerus.nylium.server.key.NamespacedKey;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.stream.StreamSupport;
@@ -89,26 +92,34 @@ public class EncryptionListener {
         }
 
         session.setEncrypted(true);
-        session.setState(PlayerSession.SessionState.PLAY);
         session.sendPacket(new LoginSuccessPacketOut(session.getGameProfile().getId(), session.getGameProfile().getUsername()));
-        /*session.sendPacket(new JoinGamePacketOut(
-                0,
-                false,
-                (byte) 0,
-                (byte) -1,
-                new NamespacedKey[] {NamespacedKey.def("affe")},
-                TagCompound.createRootTag(),
-                TagCompound.createRootTag(),
-                NamespacedKey.def("affe"),
-                1337L,
-                1337,
-                2,
-                false,
-                true,
-                false,
-                false
-        ));*/
-        session.disconnect("Work in progress");
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(2000L);
+            } catch (final InterruptedException e) {
+                e.printStackTrace();
+            }
+            session.sendPacket(new JoinGamePacketOut(
+                    0,
+                    false,
+                    (byte) 0,
+                    (byte) -1,
+                    new NamespacedKey[] {NamespacedKey.def("world")},
+                    DimensionCodec.getDimensionCodec(),
+                    DimensionCodec.getDimensionType(0),
+                    NamespacedKey.def("world"),
+                    1337L,
+                    1337,
+                    2,
+                    false,
+                    true,
+                    false,
+                    false
+            ));
+            session.setState(PlayerSession.SessionState.PLAY);
+        }).start();
+        //session.disconnect("Work in progress");
     }
 
 }
