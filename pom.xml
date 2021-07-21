@@ -24,6 +24,10 @@
     </properties>
 
     <repositories>
+        <repository>
+            <id>jitpack</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -43,9 +47,9 @@
         </dependency>
 
         <dependency>
-            <groupId>dev.cerus</groupId>
+            <groupId>com.github.cerus</groupId>
             <artifactId>simple-nbt</artifactId>
-            <version>1.1.8</version>
+            <version>77943ab924</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
