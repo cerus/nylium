@@ -103,7 +103,8 @@ public class NettyBootstrapper {
 
                                 @Override
                                 public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-                                    LOGGER.log(Level.SEVERE, "The Netty bootstrapper caught an exception", cause);
+                                    cause.printStackTrace();
+                                    LOGGER.log(Level.SEVERE, "The Netty bootstrapper caught an exception");
                                 }
                             });
                         }

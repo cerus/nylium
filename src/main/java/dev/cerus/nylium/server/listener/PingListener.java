@@ -12,6 +12,7 @@ import dev.cerus.nylium.io.packet.implementation.PongPacketOut;
 import dev.cerus.nylium.io.packet.implementation.RequestPacketIn;
 import dev.cerus.nylium.io.packet.implementation.ResponsePacketOut;
 import dev.cerus.nylium.io.session.PlayerSession;
+import dev.cerus.nylium.server.NyliumServer;
 import java.util.UUID;
 
 /**
@@ -46,8 +47,8 @@ public class PingListener {
         // TODO: Proper implementation
         final JsonObject object = new JsonObject();
         final JsonObject version = new JsonObject();
-        version.addProperty("name", "Nylium");
-        version.addProperty("protocol", session.getProtocolVer() + 100);
+        version.addProperty("name", NyliumServer.PROTOCOL_NAME);
+        version.addProperty("protocol", NyliumServer.PROTOCOL_VERSION);
         object.add("version", version);
         final JsonObject players = new JsonObject();
         players.addProperty("max", 0);

@@ -4,6 +4,8 @@ import dev.cerus.nylium.io.packet.PacketOut;
 import dev.cerus.nylium.io.packet.implementation.DisconnectPacketOut;
 import dev.cerus.nylium.io.session.encryption.DefaultEncryptionContainer;
 import dev.cerus.nylium.io.session.encryption.EncryptionContainer;
+import dev.cerus.nylium.server.chat.ChatComponent;
+import dev.cerus.nylium.server.chat.StringComponent;
 import dev.cerus.nylium.server.entity.PlayerEntity;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -50,7 +52,16 @@ public class PlayerSession {
      * @param reason The reason for the disconnect
      */
     public void disconnect(final String reason) {
-        this.sendPacket(new DisconnectPacketOut(false, reason));
+        this.disconnect(StringComponent.of(reason));
+    }
+
+    /**
+     * Disconnects the client
+     *
+     * @param reason The reason for the disconnect
+     */
+    public void disconnect(final ChatComponent reason) {
+        this.sendPacket(new DisconnectPacketOut(this.state != SessionState.PLAY, reason));
         this.context.close();
     }
 

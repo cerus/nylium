@@ -9,6 +9,10 @@ import dev.cerus.nylium.io.packet.implementation.EncryptionRequestPacketOut;
 import dev.cerus.nylium.io.packet.implementation.HandshakePacketIn;
 import dev.cerus.nylium.io.packet.implementation.LoginStartPacketIn;
 import dev.cerus.nylium.io.session.PlayerSession;
+import dev.cerus.nylium.server.NyliumServer;
+import dev.cerus.nylium.server.chat.ChatColor;
+import dev.cerus.nylium.server.chat.ChatComponentStyle;
+import dev.cerus.nylium.server.chat.StringComponent;
 
 /**
  * Handles the login process
@@ -36,6 +40,16 @@ public class LoginListener {
         final PacketProcessEvent event = new PacketProcessEvent(session, packet);
         this.eventBus.callEvent(event);
         if (event.isCancelled()) {
+            return;
+        }
+
+        if (session.getProtocolVer() < NyliumServer.PROTOCOL_VERSION) {
+            session.disconnect(StringComponent.of("Client too old")
+                    .setStyle(new ChatComponentStyle()
+                            .setColor(ChatColor.RED))
+                    .addSibling(StringComponent.of(" (" + session.getProtocolVer() + " < " + NyliumServer.PROTOCOL_VERSION + ")")
+                            .setStyle(new ChatComponentStyle()
+                                    .setColor(ChatColor.WHITE))));
             return;
         }
 

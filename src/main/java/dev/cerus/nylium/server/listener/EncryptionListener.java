@@ -6,14 +6,13 @@ import dev.cerus.nylium.event.Subscribe;
 import dev.cerus.nylium.event.implementation.PacketProcessEvent;
 import dev.cerus.nylium.event.implementation.PacketReceivedEvent;
 import dev.cerus.nylium.io.packet.PacketIn;
-import dev.cerus.nylium.io.packet.implementation.DisconnectPacketOut;
 import dev.cerus.nylium.io.packet.implementation.EncryptionResponsePacketIn;
-import dev.cerus.nylium.io.packet.implementation.JoinGamePacketOut;
 import dev.cerus.nylium.io.packet.implementation.LoginSuccessPacketOut;
 import dev.cerus.nylium.io.session.PlayerSession;
 import dev.cerus.nylium.mojang.MojangApiWrapper;
-import dev.cerus.nylium.server.key.NamespacedKey;
-import dev.cerus.simplenbt.tag.TagCompound;
+import dev.cerus.nylium.server.chat.ChatColor;
+import dev.cerus.nylium.server.chat.ChatComponentStyle;
+import dev.cerus.nylium.server.chat.StringComponent;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.stream.StreamSupport;
@@ -56,8 +55,9 @@ public class EncryptionListener {
         }
 
         if (!Arrays.equals(decryptedVerifyToken, session.getEncryptionContainer().getVerifyToken())) {
-            session.sendPacket(new DisconnectPacketOut(false, "Invalid verify token"));
-            session.getContext().close();
+            session.disconnect(StringComponent.of("Invalid verify token")
+                    .setStyle(new ChatComponentStyle()
+                            .setColor(ChatColor.RED)));
             return;
         }
 
@@ -91,7 +91,7 @@ public class EncryptionListener {
         session.setEncrypted(true);
         session.setState(PlayerSession.SessionState.PLAY);
         session.sendPacket(new LoginSuccessPacketOut(session.getGameProfile().getId(), session.getGameProfile().getUsername()));
-        session.sendPacket(new JoinGamePacketOut(
+        /*session.sendPacket(new JoinGamePacketOut(
                 0,
                 false,
                 (byte) 0,
@@ -107,8 +107,8 @@ public class EncryptionListener {
                 true,
                 false,
                 false
-        ));
-        //session.sendPacket(new DisconnectPacketOut(false, "Work in progress"));
+        ));*/
+        session.disconnect("Work in progress");
     }
 
 }
