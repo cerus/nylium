@@ -3,9 +3,13 @@ package dev.cerus.nylium;
 import dev.cerus.nylium.event.EventBus;
 import dev.cerus.nylium.io.NettyBootstrapper;
 import dev.cerus.nylium.io.session.PlayerSessionController;
+import dev.cerus.nylium.server.NyliumServer;
+import dev.cerus.nylium.server.NyliumTicker;
 import dev.cerus.nylium.server.listener.EncryptionListener;
 import dev.cerus.nylium.server.listener.LoginListener;
 import dev.cerus.nylium.server.listener.PingListener;
+import dev.cerus.nylium.server.listener.SettingsListener;
+import dev.cerus.nylium.server.tick.KeepAliveTickable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Formatter;
@@ -46,6 +50,7 @@ public class NyliumLauncher {
         eventBus.registerListener(new LoginListener(eventBus));
         eventBus.registerListener(new EncryptionListener(eventBus));
         eventBus.registerListener(new PingListener(eventBus));
+        eventBus.registerListener(new SettingsListener(eventBus));
 
         // Create the player session controller
         final PlayerSessionController sessionController = new PlayerSessionController(eventBus);
@@ -55,6 +60,15 @@ public class NyliumLauncher {
         // Boot up Netty
         final NettyBootstrapper nettyBootstrapper = new NettyBootstrapper(sessionController, eventBus);
         nettyBootstrapper.start();
+
+        LOGGER.info("Starting server ticker");
+
+        final NyliumTicker ticker = new NyliumTicker(new NyliumServer());
+        final KeepAliveTickable keepAliveTickable = new KeepAliveTickable(sessionController);
+        ticker.addTickable(keepAliveTickable);
+        eventBus.registerListener(keepAliveTickable);
+
+        ticker.startTicking();
     }
 
     private static void printBrand() {

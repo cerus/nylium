@@ -1,5 +1,7 @@
 package dev.cerus.nylium.server;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class NyliumTicker {
@@ -8,6 +10,7 @@ public class NyliumTicker {
     public static final int MILLIS_PER_TICK = 1000 / TICKS_PER_SECOND;
     public static final long MILLIS_PER_TICK_NANOS = TimeUnit.MILLISECONDS.toNanos(MILLIS_PER_TICK);
 
+    private final List<Tickable> tickables = new ArrayList<>();
     private final NyliumServer server;
 
     private Thread tickingThread;
@@ -31,6 +34,7 @@ public class NyliumTicker {
             final long nanoBefore = System.nanoTime();
 
             // Tick
+            this.tickables.forEach(Tickable::tick);
             this.server.tick();
 
             final long nanoAfter = System.nanoTime();
@@ -58,8 +62,18 @@ public class NyliumTicker {
         this.tickingThread.join();
     }
 
+    public void addTickable(final Tickable tickable) {
+        this.tickables.add(tickable);
+    }
+
     public Thread getTickingThread() {
         return this.tickingThread;
+    }
+
+    public static interface Tickable {
+
+        void tick();
+
     }
 
 }

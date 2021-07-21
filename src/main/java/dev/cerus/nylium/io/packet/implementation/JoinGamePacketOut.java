@@ -61,6 +61,7 @@ public class JoinGamePacketOut extends PacketOut {
 
     @Override
     public void write(final ByteBuf byteBuf) {
+        IOUtils.writeVarInt(byteBuf, 0x26);
         byteBuf.writeInt(this.entityId);
         byteBuf.writeByte(this.hardcore ? 0x01 : 0x00);
         byteBuf.writeByte(this.gamemode);
@@ -69,8 +70,8 @@ public class JoinGamePacketOut extends PacketOut {
         for (final NamespacedKey name : this.worldNames) {
             IOUtils.writeString(byteBuf, name.toString());
         }
-        IOUtils.writeNbt(byteBuf, this.dimensionCodec, false, false);
-        IOUtils.writeNbt(byteBuf, this.dimension, false, false);
+        IOUtils.writeNbt(byteBuf, this.dimensionCodec, true, false);
+        IOUtils.writeNbt(byteBuf, this.dimension, true, false);
         IOUtils.writeString(byteBuf, this.worldName.toString());
         byteBuf.writeLong(this.hashedSeed);
         IOUtils.writeVarInt(byteBuf, this.maxPlayers);

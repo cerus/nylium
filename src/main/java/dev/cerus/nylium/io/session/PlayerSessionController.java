@@ -45,4 +45,8 @@ public class PlayerSessionController {
         this.eventBus.callEvent(new SessionRemovedEvent(session));
     }
 
+    public Set<PlayerSession> getPlayerSessions() {
+        return Set.copyOf(this.playerSessions);
+    }
+
 }

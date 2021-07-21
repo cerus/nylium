@@ -1,6 +1,7 @@
 package dev.cerus.nylium.io.session;
 
 import dev.cerus.nylium.io.packet.PacketOut;
+import dev.cerus.nylium.io.packet.implementation.DisconnectPacketOut;
 import dev.cerus.nylium.io.session.encryption.DefaultEncryptionContainer;
 import dev.cerus.nylium.io.session.encryption.EncryptionContainer;
 import dev.cerus.nylium.server.entity.PlayerEntity;
@@ -17,6 +18,9 @@ import javax.crypto.NoSuchPaddingException;
 
 public class PlayerSession {
 
+    public static int NEXT_ID = 0;
+
+    private final int id = NEXT_ID++;
     private final ChannelHandlerContext context;
     private final GameProfile gameProfile;
     private final EncryptionContainer encryptionContainer;
@@ -24,17 +28,30 @@ public class PlayerSession {
     private int protocolVer;
     private SessionState state;
     private boolean encrypted;
+    private Settings settings;
 
-    public PlayerSession(final ChannelHandlerContext context) throws InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    public PlayerSession(final ChannelHandlerContext context) throws InvalidAlgorithmParameterException,
+            NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         this(context, null);
     }
 
-    public PlayerSession(final ChannelHandlerContext context, final PlayerEntity playerEntity) throws InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    public PlayerSession(final ChannelHandlerContext context, final PlayerEntity playerEntity) throws InvalidAlgorithmParameterException,
+            NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         this.context = context;
         this.gameProfile = new GameProfile(null, null);
         this.encryptionContainer = new DefaultEncryptionContainer();
         this.playerEntity = playerEntity;
         this.state = SessionState.NONE;
+    }
+
+    /**
+     * Disconnects the client
+     *
+     * @param reason The reason for the disconnect
+     */
+    public void disconnect(final String reason) {
+        this.sendPacket(new DisconnectPacketOut(false, reason));
+        this.context.close();
     }
 
     /**
@@ -97,6 +114,18 @@ public class PlayerSession {
         this.encrypted = encrypted;
     }
 
+    public Settings getSettings() {
+        return this.settings;
+    }
+
+    public void setSettings(final Settings settings) {
+        this.settings = settings;
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
     /**
      * Contains the different login states
      */
@@ -150,6 +179,67 @@ public class PlayerSession {
         }
 
         public record Property(String name, String value, String signature) {
+        }
+
+    }
+
+    public record Settings(String locale, byte viewDistance, PlayerSession.Settings.ChatMode chatMode,
+                           boolean colors, PlayerSession.Settings.SkinParts skinParts, boolean rightHanded,
+                           boolean disableTextFiltering) {
+
+        public enum ChatMode {
+            ENABLED(0), COMMANDS_ONLY(1), HIDDEN(2);
+
+            private final int id;
+
+            ChatMode(final int id) {
+                this.id = id;
+            }
+
+            public static ChatMode getById(final int id) {
+                for (final ChatMode value : values()) {
+                    if (value.id == id) {
+                        return value;
+                    }
+                }
+                return null;
+            }
+
+            public int getId() {
+                return this.id;
+            }
+        }
+
+        public record SkinParts(byte backingByte) {
+
+            public boolean cape() {
+                return (this.backingByte & 0x01) == 0x01;
+            }
+
+            public boolean jacket() {
+                return (this.backingByte & 0x02) == 0x02;
+            }
+
+            public boolean leftSleeve() {
+                return (this.backingByte & 0x04) == 0x04;
+            }
+
+            public boolean rightSleeve() {
+                return (this.backingByte & 0x08) == 0x08;
+            }
+
+            public boolean leftLeg() {
+                return (this.backingByte & 0x10) == 0x10;
+            }
+
+            public boolean rightLeg() {
+                return (this.backingByte & 0x20) == 0x20;
+            }
+
+            public boolean hat() {
+                return (this.backingByte & 0x40) == 0x40;
+            }
+
         }
 
     }

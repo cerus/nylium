@@ -38,8 +38,8 @@ public class PacketEncryptor extends ByteToMessageCodec<ByteBuf> {
         if (session.isEncrypted()) {
             final byte[] inBytes = new byte[in.readableBytes()];
             in.readBytes(inBytes);
-            final ByteBuf buffer = Unpooled.buffer();
-            buffer.writeBytes(inBytes, 0, session.getEncryptionContainer().decryptCommon(inBytes, 0, in.readableBytes(), inBytes, 0));
+            final ByteBuf buffer = ctx.alloc().heapBuffer(session.getEncryptionContainer().getCommonDecryptOutputSize(inBytes.length));
+            buffer.writerIndex(session.getEncryptionContainer().decryptCommon(inBytes, 0, inBytes.length, buffer.array(), buffer.arrayOffset()));
             out.add(buffer);
         } else {
             final ByteBuf outBuf = Unpooled.buffer();

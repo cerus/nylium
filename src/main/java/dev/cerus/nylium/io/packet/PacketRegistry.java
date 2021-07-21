@@ -1,7 +1,9 @@
 package dev.cerus.nylium.io.packet;
 
+import dev.cerus.nylium.io.packet.implementation.ClientSettingsPacketIn;
 import dev.cerus.nylium.io.packet.implementation.EncryptionResponsePacketIn;
 import dev.cerus.nylium.io.packet.implementation.HandshakePacketIn;
+import dev.cerus.nylium.io.packet.implementation.KeepAlivePacketIn;
 import dev.cerus.nylium.io.packet.implementation.LoginStartPacketIn;
 import dev.cerus.nylium.io.packet.implementation.PingPacketIn;
 import dev.cerus.nylium.io.packet.implementation.RequestPacketIn;
@@ -27,6 +29,8 @@ public class PacketRegistry {
                     && context.session.getState() == PlayerSession.SessionState.LOGIN, LoginStartPacketIn::new);
             this.put((context) -> context.id == 0x01
                     && context.session.getState() == PlayerSession.SessionState.ENCRYPTING, EncryptionResponsePacketIn::new);
+            this.put(context -> context.id == 0x05 && context.session.getState() == PlayerSession.SessionState.PLAY, ClientSettingsPacketIn::new);
+            this.put(context -> context.id == 0x0F && context.session.getState() == PlayerSession.SessionState.PLAY, KeepAlivePacketIn::new);
         }
     };
 
@@ -39,7 +43,6 @@ public class PacketRegistry {
      * @return A packet or null
      */
     public static PacketIn readPacket(final PacketReadingContext context, final ByteBuf byteBuffer) {
-        System.out.println("FINDING MATCHING PACKET FOR ID " + context.id + " LEN " + context.length);
         return INCOMING_PACKET_MAP.keySet().stream()
                 .filter(fun -> fun.apply(context))
                 .map(fun -> INCOMING_PACKET_MAP.get(fun).apply(byteBuffer))

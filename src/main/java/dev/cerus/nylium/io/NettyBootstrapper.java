@@ -19,12 +19,16 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The heart of the Nylium server: The Netty bootstrapper
  * Starts a Netty server with the appropriate channel handlers
  */
 public class NettyBootstrapper {
+
+    private static final Logger LOGGER = Logger.getLogger(NettyBootstrapper.class.getName());
 
     private final PlayerSessionController sessionController;
     private final EventBus eventBus;
@@ -75,12 +79,15 @@ public class NettyBootstrapper {
                                 @Override
                                 public void channelActive(final ChannelHandlerContext ctx) throws Exception {
                                     NettyBootstrapper.this.sessionController.addSession(new PlayerSession(ctx));
+                                    LOGGER.info("New connection from " + ctx.channel().remoteAddress().toString());
                                 }
 
                                 @Override
                                 public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
                                     final PlayerSession session = NettyBootstrapper.this.sessionController.getByChId(ctx.channel().id());
                                     NettyBootstrapper.this.sessionController.removeSession(session);
+                                    LOGGER.info("Client " + session.getGameProfile().getUsername() + " ("
+                                            + ctx.channel().remoteAddress().toString() + ") disconnected");
                                 }
 
                                 @Override
@@ -96,7 +103,7 @@ public class NettyBootstrapper {
 
                                 @Override
                                 public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-                                    cause.printStackTrace();
+                                    LOGGER.log(Level.SEVERE, "The Netty bootstrapper caught an exception", cause);
                                 }
                             });
                         }
