@@ -91,35 +91,28 @@ public class EncryptionListener {
             return;
         }
 
+        session.setState(PlayerSession.SessionState.PLAY);
         session.setEncrypted(true);
         session.sendPacket(new LoginSuccessPacketOut(session.getGameProfile().getId(), session.getGameProfile().getUsername()));
 
-        new Thread(() -> {
-            try {
-                Thread.sleep(2000L);
-            } catch (final InterruptedException e) {
-                e.printStackTrace();
-            }
-            session.sendPacket(new JoinGamePacketOut(
-                    0,
-                    false,
-                    (byte) 0,
-                    (byte) -1,
-                    new NamespacedKey[] {NamespacedKey.def("world")},
-                    DimensionCodec.getDimensionCodec(),
-                    DimensionCodec.getDimensionType(0),
-                    NamespacedKey.def("world"),
-                    1337L,
-                    1337,
-                    2,
-                    false,
-                    true,
-                    false,
-                    false
-            ));
-            session.setState(PlayerSession.SessionState.PLAY);
-        }).start();
-        //session.disconnect("Work in progress");
+        // TODO: Pull state from server
+        session.sendPacket(new JoinGamePacketOut(
+                0,
+                false,
+                (byte) 0,
+                (byte) -1,
+                new NamespacedKey[] {NamespacedKey.def("world")},
+                DimensionCodec.getDimensionCodec(),
+                DimensionCodec.getDimensionType(0),
+                NamespacedKey.def("world"),
+                1337L,
+                1337,
+                2,
+                false,
+                true,
+                false,
+                false
+        ));
     }
 
 }

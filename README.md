@@ -13,4 +13,4 @@ There is none. I don't know if this will ever be usable. I might just abandon th
 ## Status
 
 - Server list ping works (0x00 & 0x01)
-- Login and encryption implemented (not sure if it works correctly though)
+- Login and encryption works
