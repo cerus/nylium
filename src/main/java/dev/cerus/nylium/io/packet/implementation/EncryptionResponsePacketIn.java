@@ -4,6 +4,9 @@ import dev.cerus.nylium.io.IOUtils;
 import dev.cerus.nylium.io.packet.PacketIn;
 import io.netty.buffer.ByteBuf;
 
+/**
+ * 0x01 https://wiki.vg/Protocol#Encryption_Response
+ */
 public class EncryptionResponsePacketIn extends PacketIn {
 
     private byte[] sharedSecret;

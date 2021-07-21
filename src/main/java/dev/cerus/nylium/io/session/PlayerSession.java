@@ -37,6 +37,11 @@ public class PlayerSession {
         this.state = SessionState.NONE;
     }
 
+    /**
+     * Sends a packet to the client
+     *
+     * @param packet The packet to send
+     */
     public void sendPacket(final PacketOut packet) {
         System.out.println("SENDING " + packet.getClass().getSimpleName());
         final ByteBuf buf = Unpooled.buffer();
@@ -92,10 +97,26 @@ public class PlayerSession {
         this.encrypted = encrypted;
     }
 
+    /**
+     * Contains the different login states
+     */
     public enum SessionState {
-        NONE, LOGIN, ENCRYPTING, PLAY
+        // No login attempt has happened yet
+        NONE,
+
+        // Client attempts to log in
+        LOGIN,
+
+        // Client attempts to start encryption
+        ENCRYPTING,
+
+        // Client has logged in and is now in play mode
+        PLAY
     }
 
+    /**
+     * Stores player profile information (uuid, name, skin textures)
+     */
     public static class GameProfile {
 
         private final List<Property> properties;
@@ -128,30 +149,7 @@ public class PlayerSession {
             return this.properties;
         }
 
-        public static class Property {
-
-            private final String name;
-            private final String value;
-            private final String signature;
-
-            public Property(final String name, final String value, final String signature) {
-                this.name = name;
-                this.value = value;
-                this.signature = signature;
-            }
-
-            public String getName() {
-                return this.name;
-            }
-
-            public String getValue() {
-                return this.value;
-            }
-
-            public String getSignature() {
-                return this.signature;
-            }
-
+        public record Property(String name, String value, String signature) {
         }
 
     }

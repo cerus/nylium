@@ -5,6 +5,9 @@ import dev.cerus.nylium.io.packet.PacketOut;
 import io.netty.buffer.ByteBuf;
 import java.util.UUID;
 
+/**
+ * 0x02 https://wiki.vg/Protocol#Login_Success
+ */
 public class LoginSuccessPacketOut extends PacketOut {
 
     private final UUID id;

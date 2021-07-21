@@ -4,6 +4,9 @@ import dev.cerus.nylium.io.IOUtils;
 import dev.cerus.nylium.io.packet.PacketIn;
 import io.netty.buffer.ByteBuf;
 
+/**
+ * 0x00 https://wiki.vg/Protocol#Login_Start
+ */
 public class LoginStartPacketIn extends PacketIn {
 
     private String username;

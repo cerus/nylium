@@ -1,5 +1,8 @@
 package dev.cerus.nylium.server.key;
 
+/**
+ * Simple class for Minecraft's identifiers (namespace:value (eg minecraft:player))
+ */
 public class NamespacedKey {
 
     public static final String DEFAULT_NAMESPACE = "minecraft";
@@ -7,7 +10,7 @@ public class NamespacedKey {
     private final String namespace;
     private final String value;
 
-    public NamespacedKey(final String namespace, final String value) {
+    private NamespacedKey(final String namespace, final String value) {
         this.namespace = namespace;
         this.value = value;
     }

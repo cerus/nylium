@@ -10,6 +10,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class PacketCodec extends ByteToMessageCodec<Packet> {
 
@@ -43,6 +44,12 @@ public class PacketCodec extends ByteToMessageCodec<Packet> {
         ), in);
         if (packet == null) {
             throw new NullPointerException("Packet " + id + " not found");
+        }
+
+        // Check if packet has been fully read
+        if (in.readableBytes() > 0) {
+            Logger.getLogger(this.getClass().getName()).warning("Packet " + packet.getClass().getSimpleName() + " has not been fully read!");
+            in.readBytes(in.readableBytes()).release();
         }
 
         // Add to result

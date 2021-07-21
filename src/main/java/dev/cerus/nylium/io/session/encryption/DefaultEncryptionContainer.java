@@ -17,11 +17,16 @@ import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * Default encryption container
+ * Handles everything related to encrypting / decrypting during and after the key exchange
+ */
 public class DefaultEncryptionContainer implements EncryptionContainer {
 
     private static KeyPair keyPair;
 
     static {
+        // Generate random key on server startup
         try {
             final KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
             generator.initialize(1024);

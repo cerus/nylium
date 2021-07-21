@@ -8,6 +8,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 import java.util.List;
 
+/**
+ * Encrypts / decrypts packets if its enabled for the session
+ */
 public class PacketEncryptor extends ByteToMessageCodec<ByteBuf> {
 
     private final PlayerSessionController sessionController;
@@ -22,8 +25,8 @@ public class PacketEncryptor extends ByteToMessageCodec<ByteBuf> {
         if (session.isEncrypted()) {
             final byte[] inBytes = new byte[msg.readableBytes()];
             msg.readBytes(inBytes);
-
-            out.writeBytes(inBytes, 0, session.getEncryptionContainer().encryptCommon(inBytes, 0, msg.readableBytes(), inBytes, 0));
+            final int len = session.getEncryptionContainer().getCommonEncryptOutputSize(inBytes.length);
+            out.writeBytes(inBytes, 0, session.getEncryptionContainer().encryptCommon(inBytes, 0, len, inBytes, 0));
         } else {
             out.writeBytes(msg.readBytes(msg.readableBytes()));
         }
@@ -44,4 +47,5 @@ public class PacketEncryptor extends ByteToMessageCodec<ByteBuf> {
             out.add(outBuf);
         }
     }
+
 }

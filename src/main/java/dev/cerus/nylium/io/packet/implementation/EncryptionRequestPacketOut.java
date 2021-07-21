@@ -5,6 +5,9 @@ import dev.cerus.nylium.io.packet.PacketOut;
 import dev.cerus.nylium.io.session.encryption.EncryptionContainer;
 import io.netty.buffer.ByteBuf;
 
+/**
+ * 0x01 https://wiki.vg/Protocol#Encryption_Request
+ */
 public class EncryptionRequestPacketOut extends PacketOut {
 
     private final EncryptionContainer encryptionContainer;

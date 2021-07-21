@@ -6,6 +6,9 @@ import dev.cerus.nylium.server.key.NamespacedKey;
 import dev.cerus.simplenbt.tag.TagCompound;
 import io.netty.buffer.ByteBuf;
 
+/**
+ * 0x26 https://wiki.vg/Protocol#Join_Game
+ */
 public class JoinGamePacketOut extends PacketOut {
 
     private final int entityId;

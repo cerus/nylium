@@ -3,7 +3,9 @@ package dev.cerus.nylium;
 import dev.cerus.nylium.event.EventBus;
 import dev.cerus.nylium.io.NettyBootstrapper;
 import dev.cerus.nylium.io.session.PlayerSessionController;
+import dev.cerus.nylium.server.listener.EncryptionListener;
 import dev.cerus.nylium.server.listener.LoginListener;
+import dev.cerus.nylium.server.listener.PingListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Formatter;
@@ -42,6 +44,8 @@ public class NyliumLauncher {
         // Create the event bus and add important listeners
         final EventBus eventBus = new EventBus();
         eventBus.registerListener(new LoginListener(eventBus));
+        eventBus.registerListener(new EncryptionListener(eventBus));
+        eventBus.registerListener(new PingListener(eventBus));
 
         // Create the player session controller
         final PlayerSessionController sessionController = new PlayerSessionController(eventBus);

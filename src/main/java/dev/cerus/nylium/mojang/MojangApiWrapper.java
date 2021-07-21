@@ -7,8 +7,22 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * Simple wrapper for the Mojang api.
+ * TODO: Make cleaner and better
+ */
 public class MojangApiWrapper {
 
+    /**
+     * Report a client join to receive profile information
+     *
+     * @param username The name of the user
+     * @param hash     The server hash
+     *
+     * @return The profile object
+     *
+     * @throws IOException
+     */
     public static JsonObject hasJoined(final String username, final String hash) throws IOException {
         final URL url = new URL("https://sessionserver.mojang.com/session/minecraft/hasJoined?username=" + username + "&serverId=" + hash);
         final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -27,7 +41,6 @@ public class MojangApiWrapper {
             stringBuffer.append((char) i);
         }
 
-        System.out.println(connection.getResponseCode());
         return JsonParser.parseString(stringBuffer.toString()).getAsJsonObject();
     }
 

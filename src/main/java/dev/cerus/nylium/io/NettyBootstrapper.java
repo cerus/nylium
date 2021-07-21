@@ -62,6 +62,7 @@ public class NettyBootstrapper {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(final SocketChannel ch) throws Exception {
+                            // Encryptor handles encryption and decryption of packets when needed
                             ch.pipeline().addLast("encryptor", new PacketEncryptor(NettyBootstrapper.this.sessionController));
                             // Frame splitter is responsible for breaking down the stream into packets
                             ch.pipeline().addLast("splitter", new FrameSplitter());
