@@ -7,10 +7,10 @@ import io.netty.buffer.ByteBuf;
  */
 public abstract class PacketIn extends Packet {
 
-    public PacketIn(final ByteBuf byteBuffer) {
-        this.read(byteBuffer);
+    public PacketIn(final ByteBuf byteBuffer, final int length) {
+        this.read(byteBuffer, length);
     }
 
-    protected abstract void read(ByteBuf byteBuffer);
+    protected abstract void read(ByteBuf byteBuffer, int length);
 
 }

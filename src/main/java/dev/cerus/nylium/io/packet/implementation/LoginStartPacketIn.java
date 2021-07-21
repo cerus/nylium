@@ -11,12 +11,12 @@ public class LoginStartPacketIn extends PacketIn {
 
     private String username;
 
-    public LoginStartPacketIn(final ByteBuf byteBuffer) {
-        super(byteBuffer);
+    public LoginStartPacketIn(final ByteBuf byteBuffer, final int length) {
+        super(byteBuffer, length);
     }
 
     @Override
-    protected void read(final ByteBuf byteBuffer) {
+    protected void read(final ByteBuf byteBuffer, final int length) {
         this.username = IOUtils.readString(byteBuffer);
     }
 

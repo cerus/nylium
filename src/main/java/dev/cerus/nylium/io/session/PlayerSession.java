@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.UUID;
 import javax.crypto.NoSuchPaddingException;
 
+/**
+ * Stores player specific information
+ */
 public class PlayerSession {
 
     public static int NEXT_ID = 0;
@@ -31,6 +34,7 @@ public class PlayerSession {
     private SessionState state;
     private boolean encrypted;
     private Settings settings;
+    private String clientBrand;
 
     public PlayerSession(final ChannelHandlerContext context) throws InvalidAlgorithmParameterException,
             NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
@@ -135,6 +139,14 @@ public class PlayerSession {
 
     public int getId() {
         return this.id;
+    }
+
+    public String getClientBrand() {
+        return this.clientBrand;
+    }
+
+    public void setClientBrand(final String clientBrand) {
+        this.clientBrand = clientBrand;
     }
 
     /**

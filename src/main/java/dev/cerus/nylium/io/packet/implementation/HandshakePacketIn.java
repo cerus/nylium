@@ -14,12 +14,12 @@ public class HandshakePacketIn extends PacketIn {
     private short serverPort;
     private int nextState;
 
-    public HandshakePacketIn(final ByteBuf byteBuffer) {
-        super(byteBuffer);
+    public HandshakePacketIn(final ByteBuf byteBuffer, final int length) {
+        super(byteBuffer, length);
     }
 
     @Override
-    protected void read(final ByteBuf byteBuffer) {
+    protected void read(final ByteBuf byteBuffer, final int length) {
         this.protocolVer = IOUtils.readVarInt(byteBuffer);
         this.serverAddress = IOUtils.readString(byteBuffer);
         this.serverPort = byteBuffer.readShort();

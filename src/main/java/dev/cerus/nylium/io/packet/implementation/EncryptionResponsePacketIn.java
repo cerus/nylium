@@ -12,12 +12,12 @@ public class EncryptionResponsePacketIn extends PacketIn {
     private byte[] sharedSecret;
     private byte[] verifyToken;
 
-    public EncryptionResponsePacketIn(final ByteBuf byteBuffer) {
-        super(byteBuffer);
+    public EncryptionResponsePacketIn(final ByteBuf byteBuffer, final int length) {
+        super(byteBuffer, length);
     }
 
     @Override
-    protected void read(final ByteBuf byteBuffer) {
+    protected void read(final ByteBuf byteBuffer, final int length) {
         int len = IOUtils.readVarInt(byteBuffer);
         this.sharedSecret = new byte[len];
         byteBuffer.readBytes(this.sharedSecret);

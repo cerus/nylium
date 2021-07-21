@@ -12,12 +12,12 @@ public class ClientSettingsPacketIn extends PacketIn {
 
     private PlayerSession.Settings settings;
 
-    public ClientSettingsPacketIn(final ByteBuf byteBuffer) {
-        super(byteBuffer);
+    public ClientSettingsPacketIn(final ByteBuf byteBuffer, final int length) {
+        super(byteBuffer, length);
     }
 
     @Override
-    protected void read(final ByteBuf byteBuffer) {
+    protected void read(final ByteBuf byteBuffer, final int length) {
         this.settings = new PlayerSession.Settings(
                 IOUtils.readString(byteBuffer),
                 byteBuffer.readByte(),

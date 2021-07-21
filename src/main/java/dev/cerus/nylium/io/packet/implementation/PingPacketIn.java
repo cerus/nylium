@@ -10,12 +10,12 @@ public class PingPacketIn extends PacketIn {
 
     private long identifier;
 
-    public PingPacketIn(final ByteBuf byteBuffer) {
-        super(byteBuffer);
+    public PingPacketIn(final ByteBuf byteBuffer, final int length) {
+        super(byteBuffer, length);
     }
 
     @Override
-    protected void read(final ByteBuf byteBuffer) {
+    protected void read(final ByteBuf byteBuffer, final int length) {
         this.identifier = byteBuffer.readLong();
     }
 

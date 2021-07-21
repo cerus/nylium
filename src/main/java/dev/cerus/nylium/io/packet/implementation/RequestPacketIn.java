@@ -8,12 +8,12 @@ import io.netty.buffer.ByteBuf;
  */
 public class RequestPacketIn extends PacketIn {
 
-    public RequestPacketIn(final ByteBuf byteBuffer) {
-        super(byteBuffer);
+    public RequestPacketIn(final ByteBuf byteBuffer, final int length) {
+        super(byteBuffer, length);
     }
 
     @Override
-    protected void read(final ByteBuf byteBuffer) {
+    protected void read(final ByteBuf byteBuffer, final int length) {
     }
 
 }

@@ -9,6 +9,7 @@ import dev.cerus.nylium.server.dimension.DimensionCodec;
 import dev.cerus.nylium.server.listener.EncryptionListener;
 import dev.cerus.nylium.server.listener.LoginListener;
 import dev.cerus.nylium.server.listener.PingListener;
+import dev.cerus.nylium.server.listener.PluginMessageListener;
 import dev.cerus.nylium.server.listener.SettingsListener;
 import dev.cerus.nylium.server.tick.KeepAliveTickable;
 import java.io.IOException;
@@ -63,6 +64,7 @@ public class NyliumLauncher {
         eventBus.registerListener(new EncryptionListener(eventBus));
         eventBus.registerListener(new PingListener(eventBus));
         eventBus.registerListener(new SettingsListener(eventBus));
+        eventBus.registerListener(new PluginMessageListener(eventBus));
 
         // Create the player session controller
         final PlayerSessionController sessionController = new PlayerSessionController(eventBus);

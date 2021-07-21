@@ -48,7 +48,8 @@ public class PacketCodec extends ByteToMessageCodec<Packet> {
 
         // Check if packet has been fully read
         if (in.readableBytes() > 0) {
-            Logger.getLogger(this.getClass().getName()).warning("Packet " + packet.getClass().getSimpleName() + " has not been fully read!");
+            Logger.getLogger(this.getClass().getName()).warning("Packet " + packet.getClass().getSimpleName()
+                    + " has not been fully read! " + in.readableBytes() + " remaining");
             in.readBytes(in.readableBytes()).release();
         }
 

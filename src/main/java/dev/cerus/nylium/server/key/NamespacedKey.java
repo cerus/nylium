@@ -19,6 +19,11 @@ public class NamespacedKey {
         return new NamespacedKey(namespace, value);
     }
 
+    public static NamespacedKey of(final String key) {
+        final String[] split = key.split(":");
+        return new NamespacedKey(split[0], split[1]);
+    }
+
     public static NamespacedKey def(final String value) {
         return of(DEFAULT_NAMESPACE, value);
     }
@@ -34,6 +39,18 @@ public class NamespacedKey {
     @Override
     public String toString() {
         return this.namespace + ":" + this.value;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || this.getClass() != o.getClass()) {
+            return false;
+        }
+        final NamespacedKey that = (NamespacedKey) o;
+        return this.namespace.equals(that.namespace) && this.value.equals(that.value);
     }
 
 }

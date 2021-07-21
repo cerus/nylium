@@ -10,12 +10,12 @@ public class KeepAlivePacketIn extends PacketIn {
 
     private long identifier;
 
-    public KeepAlivePacketIn(final ByteBuf byteBuffer) {
-        super(byteBuffer);
+    public KeepAlivePacketIn(final ByteBuf byteBuffer, final int length) {
+        super(byteBuffer, length);
     }
 
     @Override
-    protected void read(final ByteBuf byteBuffer) {
+    protected void read(final ByteBuf byteBuffer, final int length) {
         this.identifier = byteBuffer.readLong();
     }
 
