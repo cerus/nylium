@@ -44,11 +44,14 @@ public class PingListener {
             return;
         }
 
+        final int protocolVer = session.getProtocolVer();
+
         // TODO: Proper implementation
         final JsonObject object = new JsonObject();
         final JsonObject version = new JsonObject();
         version.addProperty("name", NyliumServer.PROTOCOL_NAME);
-        version.addProperty("protocol", NyliumServer.PROTOCOL_VERSION);
+        version.addProperty("protocol", (protocolVer >= NyliumServer.MIN_PROTOCOL_VERSION
+                && protocolVer <= NyliumServer.MAX_PROTOCOL_VERSION) ? protocolVer : NyliumServer.MIN_PROTOCOL_VERSION);
         object.add("version", version);
         final JsonObject players = new JsonObject();
         players.addProperty("max", 0);

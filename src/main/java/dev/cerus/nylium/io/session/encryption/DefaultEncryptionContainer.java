@@ -7,7 +7,6 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -48,8 +47,6 @@ public class DefaultEncryptionContainer implements EncryptionContainer {
                 (byte) ThreadLocalRandom.current().nextInt(128),
                 (byte) ThreadLocalRandom.current().nextInt(128)
         };
-
-        System.out.println("GENERATED VERIFY TOKEN IS " + Arrays.toString(this.verifyToken));
     }
 
     @Override

@@ -43,13 +43,16 @@ public class LoginListener {
             return;
         }
 
-        if (session.getProtocolVer() < NyliumServer.PROTOCOL_VERSION) {
+        if (session.getProtocolVer() < NyliumServer.MIN_PROTOCOL_VERSION) {
             session.disconnect(StringComponent.of("Client too old")
                     .setStyle(new ChatComponentStyle()
-                            .setColor(ChatColor.RED))
-                    .addSibling(StringComponent.of(" (" + session.getProtocolVer() + " < " + NyliumServer.PROTOCOL_VERSION + ")")
-                            .setStyle(new ChatComponentStyle()
-                                    .setColor(ChatColor.WHITE))));
+                            .setColor(ChatColor.RED)));
+            return;
+        }
+        if (session.getProtocolVer() > NyliumServer.MAX_PROTOCOL_VERSION) {
+            session.disconnect(StringComponent.of("Server too old")
+                    .setStyle(new ChatComponentStyle()
+                            .setColor(ChatColor.RED)));
             return;
         }
 
