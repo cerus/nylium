@@ -1,11 +1,16 @@
 package dev.cerus.nylium;
 
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 import dev.cerus.nylium.event.EventBus;
 import dev.cerus.nylium.io.NettyBootstrapper;
 import dev.cerus.nylium.io.session.PlayerSessionController;
 import dev.cerus.nylium.server.NyliumServer;
 import dev.cerus.nylium.server.NyliumTicker;
+import dev.cerus.nylium.server.block.Block;
+import dev.cerus.nylium.server.block.BlockRegistry;
 import dev.cerus.nylium.server.dimension.DimensionCodec;
+import dev.cerus.nylium.server.key.NamespacedKey;
 import dev.cerus.nylium.server.listener.EncryptionListener;
 import dev.cerus.nylium.server.listener.LoginListener;
 import dev.cerus.nylium.server.listener.PingListener;
@@ -13,6 +18,7 @@ import dev.cerus.nylium.server.listener.PluginMessageListener;
 import dev.cerus.nylium.server.listener.SettingsListener;
 import dev.cerus.nylium.server.tick.KeepAliveTickable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Formatter;
@@ -57,6 +63,19 @@ public class NyliumLauncher {
             LOGGER.severe("Failed to load dimension codec");
             return;
         }
+
+        try {
+            final InputStream inputStream = NyliumLauncher.class.getClassLoader().getResourceAsStream("blocks.json");
+            BlockRegistry.load(inputStream);
+        } catch (final JsonIOException | JsonSyntaxException e) {
+            e.printStackTrace();
+            LOGGER.severe("Failed to load blocks");
+            return;
+        }
+
+        final Block block = new Block();
+        block.setType(NamespacedKey.mc("orange_stained_glass_pane"));
+        System.out.println(block.toString());
 
         // Create the event bus and add important listeners
         final EventBus eventBus = new EventBus();

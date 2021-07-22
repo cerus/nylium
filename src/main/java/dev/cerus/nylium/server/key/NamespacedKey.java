@@ -1,11 +1,14 @@
 package dev.cerus.nylium.server.key;
 
+import java.util.Objects;
+
 /**
  * Simple class for Minecraft's identifiers (namespace:value (eg minecraft:player))
  */
 public class NamespacedKey {
 
-    public static final String DEFAULT_NAMESPACE = "minecraft";
+    public static final String MINECRAFT_NAMESPACE = "minecraft";
+    public static final String NYLIUM_NAMESPACE = "nylium";
 
     private final String namespace;
     private final String value;
@@ -24,8 +27,12 @@ public class NamespacedKey {
         return new NamespacedKey(split[0], split[1]);
     }
 
-    public static NamespacedKey def(final String value) {
-        return of(DEFAULT_NAMESPACE, value);
+    public static NamespacedKey mc(final String value) {
+        return of(MINECRAFT_NAMESPACE, value);
+    }
+
+    public static NamespacedKey nylium(final String value) {
+        return of(NYLIUM_NAMESPACE, value);
     }
 
     public String getNamespace() {
@@ -51,6 +58,11 @@ public class NamespacedKey {
         }
         final NamespacedKey that = (NamespacedKey) o;
         return this.namespace.equals(that.namespace) && this.value.equals(that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.namespace, this.value);
     }
 
 }
