@@ -1,7 +1,7 @@
 package dev.cerus.nylium.io.session;
 
 import dev.cerus.nylium.io.packet.PacketOut;
-import dev.cerus.nylium.io.packet.implementation.DisconnectPacketOut;
+import dev.cerus.nylium.io.packet.implementation.out.DisconnectPacketOut;
 import dev.cerus.nylium.io.session.encryption.DefaultEncryptionContainer;
 import dev.cerus.nylium.io.session.encryption.EncryptionContainer;
 import dev.cerus.nylium.server.chat.ChatComponent;
@@ -47,7 +47,7 @@ public class PlayerSession {
         this.gameProfile = new GameProfile(null, null);
         this.encryptionContainer = new DefaultEncryptionContainer();
         this.playerEntity = playerEntity;
-        this.state = SessionState.NONE;
+        this.state = SessionState.HANDSHAKE;
     }
 
     /**
@@ -153,8 +153,8 @@ public class PlayerSession {
      * Contains the different login states
      */
     public enum SessionState {
-        // No login attempt has happened yet
-        NONE,
+        // No login attempt has happened yet, only a ping
+        HANDSHAKE,
 
         // Client attempts to log in
         LOGIN,

@@ -4,7 +4,7 @@ import dev.cerus.nylium.event.EventBus;
 import dev.cerus.nylium.event.Subscribe;
 import dev.cerus.nylium.event.implementation.PacketProcessEvent;
 import dev.cerus.nylium.event.implementation.PacketReceivedEvent;
-import dev.cerus.nylium.io.packet.implementation.ClientSettingsPacketIn;
+import dev.cerus.nylium.io.packet.implementation.in.ClientSettingsPacketIn;
 
 /**
  * Listens for the client settings packet to update the session

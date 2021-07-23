@@ -25,7 +25,9 @@ public class BlockRegistry {
 
     private static final Map<NamespacedKey, Set<State>> POSSIBLE_STATES_MAP = new HashMap<>();
     private static final Map<IdentifiableState, Integer> STATE_PROTOCOL_MAP = new HashMap<>();
-    private static State AIR;
+    private static final Map<Integer, IdentifiableState> PROTOCOL_STATE_MAP = new HashMap<>();
+    public static int BITS_PER_BLOCK;
+    public static IdentifiableState AIR;
 
     /**
      * Attempts to load the global palette from the provided input stream
@@ -69,15 +71,25 @@ public class BlockRegistry {
                         def
                 );
                 possibleStates.add(state);
-                STATE_PROTOCOL_MAP.put(IdentifiableState.of(type, state), id);
+
+                final IdentifiableState identifiableState = IdentifiableState.of(type, state);
+                STATE_PROTOCOL_MAP.put(identifiableState, id);
+                PROTOCOL_STATE_MAP.put(id, identifiableState);
             }
 
             // Register this type and its possible states
             POSSIBLE_STATES_MAP.put(type, possibleStates);
         }
 
-        AIR = getDefaultState(NamespacedKey.mc("air"));
-        LOGGER.info("Loaded " + POSSIBLE_STATES_MAP.size() + " blocks");
+        AIR = getState(0);
+
+        BITS_PER_BLOCK = STATE_PROTOCOL_MAP.values().stream()
+                .mapToInt(value -> value)
+                .max()
+                .orElse(0);
+        BITS_PER_BLOCK = (int) Math.ceil(Math.log(BITS_PER_BLOCK) / Math.log(2));
+
+        LOGGER.info("Loaded " + POSSIBLE_STATES_MAP.size() + " blocks (bpb: " + BITS_PER_BLOCK + ")");
     }
 
     public static int getProtocolId(final IdentifiableState state) {
@@ -88,9 +100,11 @@ public class BlockRegistry {
         return POSSIBLE_STATES_MAP.get(type).stream()
                 .filter(State::isDefault)
                 .findFirst()
-                .orElse(AIR);
-        // "Blocks that are not found in the palette should be treated as air" ~ wiki.vg
-        //.orElseThrow(() -> new IllegalStateException("Can't find a default state for " + type.toString()));
+                .orElseThrow(() -> new IllegalStateException("Can't find a default state for " + type.toString()));
+    }
+
+    public static IdentifiableState getState(final int protocol) {
+        return PROTOCOL_STATE_MAP.get(protocol);
     }
 
 }

@@ -1,13 +1,15 @@
 package dev.cerus.nylium.io.packet;
 
-import dev.cerus.nylium.io.packet.implementation.ClientSettingsPacketIn;
-import dev.cerus.nylium.io.packet.implementation.EncryptionResponsePacketIn;
-import dev.cerus.nylium.io.packet.implementation.HandshakePacketIn;
-import dev.cerus.nylium.io.packet.implementation.KeepAlivePacketIn;
-import dev.cerus.nylium.io.packet.implementation.LoginStartPacketIn;
-import dev.cerus.nylium.io.packet.implementation.PingPacketIn;
-import dev.cerus.nylium.io.packet.implementation.PluginMessagePacketIn;
-import dev.cerus.nylium.io.packet.implementation.RequestPacketIn;
+import dev.cerus.nylium.io.packet.implementation.in.ClientSettingsPacketIn;
+import dev.cerus.nylium.io.packet.implementation.in.EncryptionResponsePacketIn;
+import dev.cerus.nylium.io.packet.implementation.in.HandshakePacketIn;
+import dev.cerus.nylium.io.packet.implementation.in.KeepAlivePacketIn;
+import dev.cerus.nylium.io.packet.implementation.in.LoginStartPacketIn;
+import dev.cerus.nylium.io.packet.implementation.in.PingPacketIn;
+import dev.cerus.nylium.io.packet.implementation.in.PlayerPositionAndRotationPacketIn;
+import dev.cerus.nylium.io.packet.implementation.in.PluginMessagePacketIn;
+import dev.cerus.nylium.io.packet.implementation.in.RequestPacketIn;
+import dev.cerus.nylium.io.packet.implementation.in.TeleportConfirmPacketIn;
 import dev.cerus.nylium.io.session.PlayerSession;
 import io.netty.buffer.ByteBuf;
 import java.util.HashMap;
@@ -23,10 +25,12 @@ public class PacketRegistry {
     private static final Map<Function<PacketReadingContext, Boolean>, BiFunction<ByteBuf, Integer, ? extends PacketIn>> INCOMING_PACKET_MAP = new HashMap<>() {
         {
             this.put((context) -> context.id == 0x00 && context.length > 0
-                    && context.session.getState() != PlayerSession.SessionState.LOGIN, HandshakePacketIn::new);
+                    && context.session.getState() != PlayerSession.SessionState.LOGIN
+                    && context.session.getState() != PlayerSession.SessionState.PLAY, HandshakePacketIn::new);
             this.put((context) -> context.id == 0x00 && context.length == 0, RequestPacketIn::new);
             this.put((context) -> context.id == 0x01
-                    && context.session.getState() != PlayerSession.SessionState.ENCRYPTING, PingPacketIn::new);
+                    && context.session.getState() != PlayerSession.SessionState.ENCRYPTING
+                    && context.session.getState() != PlayerSession.SessionState.PLAY, PingPacketIn::new);
             this.put((context) -> context.id == 0x00 && context.length > 0
                     && context.session.getState() == PlayerSession.SessionState.LOGIN, LoginStartPacketIn::new);
             this.put((context) -> context.id == 0x01
@@ -34,6 +38,8 @@ public class PacketRegistry {
             this.put(context -> context.id == 0x05 && context.session.getState() == PlayerSession.SessionState.PLAY, ClientSettingsPacketIn::new);
             this.put(context -> context.id == 0x0F && context.session.getState() == PlayerSession.SessionState.PLAY, KeepAlivePacketIn::new);
             this.put(context -> context.id == 0x0A && context.session.getState() == PlayerSession.SessionState.PLAY, PluginMessagePacketIn::new);
+            this.put(context -> context.id == 0x00 && context.session.getState() == PlayerSession.SessionState.PLAY, TeleportConfirmPacketIn::new);
+            this.put(context -> context.id == 0x12 && context.session.getState() == PlayerSession.SessionState.PLAY, PlayerPositionAndRotationPacketIn::new);
         }
     };
 

@@ -7,13 +7,12 @@ import dev.cerus.nylium.io.NettyBootstrapper;
 import dev.cerus.nylium.io.session.PlayerSessionController;
 import dev.cerus.nylium.server.NyliumServer;
 import dev.cerus.nylium.server.NyliumTicker;
-import dev.cerus.nylium.server.block.Block;
 import dev.cerus.nylium.server.block.BlockRegistry;
 import dev.cerus.nylium.server.dimension.DimensionCodec;
-import dev.cerus.nylium.server.key.NamespacedKey;
 import dev.cerus.nylium.server.listener.EncryptionListener;
 import dev.cerus.nylium.server.listener.LoginListener;
 import dev.cerus.nylium.server.listener.PingListener;
+import dev.cerus.nylium.server.listener.PlayerMoveListener;
 import dev.cerus.nylium.server.listener.PluginMessageListener;
 import dev.cerus.nylium.server.listener.SettingsListener;
 import dev.cerus.nylium.server.tick.KeepAliveTickable;
@@ -73,10 +72,6 @@ public class NyliumLauncher {
             return;
         }
 
-        final Block block = new Block();
-        block.setType(NamespacedKey.mc("orange_stained_glass_pane"));
-        System.out.println(block.toString());
-
         // Create the event bus and add important listeners
         final EventBus eventBus = new EventBus();
         eventBus.registerListener(new LoginListener(eventBus));
@@ -84,6 +79,7 @@ public class NyliumLauncher {
         eventBus.registerListener(new PingListener(eventBus));
         eventBus.registerListener(new SettingsListener(eventBus));
         eventBus.registerListener(new PluginMessageListener(eventBus));
+        eventBus.registerListener(new PlayerMoveListener(eventBus));
 
         // Create the player session controller
         final PlayerSessionController sessionController = new PlayerSessionController(eventBus);
@@ -96,7 +92,7 @@ public class NyliumLauncher {
 
         LOGGER.info("Starting server ticker");
 
-        final NyliumTicker ticker = new NyliumTicker(new NyliumServer());
+        final NyliumTicker ticker = new NyliumTicker(new NyliumServer(sessionController));
         final KeepAliveTickable keepAliveTickable = new KeepAliveTickable(sessionController);
         ticker.addTickable(keepAliveTickable);
         eventBus.registerListener(keepAliveTickable);

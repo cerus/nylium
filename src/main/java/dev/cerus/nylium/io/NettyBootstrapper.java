@@ -87,7 +87,7 @@ public class NettyBootstrapper {
                                     final PlayerSession session = NettyBootstrapper.this.sessionController.getByChId(ctx.channel().id());
                                     NettyBootstrapper.this.sessionController.removeSession(session);
                                     LOGGER.info("Client " + session.getGameProfile().getUsername() + " ("
-                                            + ctx.channel().remoteAddress().toString() + ") disconnected");
+                                            + ctx.channel().remoteAddress().toString() + ") disconnected [" + session.getState() + "]");
                                 }
 
                                 @Override

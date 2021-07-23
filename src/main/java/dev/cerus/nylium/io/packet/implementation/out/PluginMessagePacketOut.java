@@ -1,4 +1,4 @@
-package dev.cerus.nylium.io.packet.implementation;
+package dev.cerus.nylium.io.packet.implementation.out;
 
 import dev.cerus.nylium.io.IOUtils;
 import dev.cerus.nylium.io.packet.PacketOut;

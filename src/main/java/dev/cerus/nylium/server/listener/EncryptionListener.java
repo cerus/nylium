@@ -5,17 +5,29 @@ import dev.cerus.nylium.event.EventBus;
 import dev.cerus.nylium.event.Subscribe;
 import dev.cerus.nylium.event.implementation.PacketProcessEvent;
 import dev.cerus.nylium.event.implementation.PacketReceivedEvent;
+import dev.cerus.nylium.io.IOUtils;
 import dev.cerus.nylium.io.packet.PacketIn;
-import dev.cerus.nylium.io.packet.implementation.EncryptionResponsePacketIn;
-import dev.cerus.nylium.io.packet.implementation.JoinGamePacketOut;
-import dev.cerus.nylium.io.packet.implementation.LoginSuccessPacketOut;
+import dev.cerus.nylium.io.packet.implementation.in.EncryptionResponsePacketIn;
+import dev.cerus.nylium.io.packet.implementation.out.ChunkDataPacketOut;
+import dev.cerus.nylium.io.packet.implementation.out.JoinGamePacketOut;
+import dev.cerus.nylium.io.packet.implementation.out.LoginSuccessPacketOut;
+import dev.cerus.nylium.io.packet.implementation.out.PlayerPositionAndLookPacketOut;
+import dev.cerus.nylium.io.packet.implementation.out.PluginMessagePacketOut;
 import dev.cerus.nylium.io.session.PlayerSession;
 import dev.cerus.nylium.mojang.MojangApiWrapper;
+import dev.cerus.nylium.server.block.BlockRegistry;
+import dev.cerus.nylium.server.block.states.IdentifiableState;
 import dev.cerus.nylium.server.chat.ChatColor;
 import dev.cerus.nylium.server.chat.ChatComponentStyle;
 import dev.cerus.nylium.server.chat.StringComponent;
+import dev.cerus.nylium.server.chunk.ChunkColumn;
 import dev.cerus.nylium.server.dimension.DimensionCodec;
+import dev.cerus.nylium.server.entity.PlayerEntity;
+import dev.cerus.nylium.server.key.MinecraftKeys;
 import dev.cerus.nylium.server.key.NamespacedKey;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.stream.StreamSupport;
@@ -113,6 +125,43 @@ public class EncryptionListener {
                 false,
                 false
         ));
+
+        final ByteArrayOutputStream barr = new ByteArrayOutputStream();
+        try {
+            IOUtils.writeVarInt(barr, "Nylium".length());
+            barr.write("Nylium".getBytes(StandardCharsets.UTF_8));
+            final PluginMessagePacketOut msgOut = new PluginMessagePacketOut(MinecraftKeys.BRAND, barr.toByteArray());
+            session.sendPacket(msgOut);
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+
+        session.setPlayerEntity(new PlayerEntity(session));
+        final PlayerPositionAndLookPacketOut posPacket = new PlayerPositionAndLookPacketOut(session.getPlayerEntity().getPos(), 0, 0);
+        session.sendPacket(posPacket);
+
+        final ChunkColumn theColumn = new ChunkColumn(0, 0);
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                theColumn.setBlock(x, 0, z, IdentifiableState.of(NamespacedKey.mc("bedrock"), BlockRegistry.getDefaultState(NamespacedKey.mc("bedrock"))));
+            }
+        }
+
+        final ChunkColumn[] chunkColumns = new ChunkColumn[] {
+                theColumn,
+                new ChunkColumn(0, 1),
+                new ChunkColumn(1, 0),
+                new ChunkColumn(1, 1),
+                new ChunkColumn(0, -1),
+                new ChunkColumn(-1, 0),
+                new ChunkColumn(-1, -1),
+                new ChunkColumn(-1, 1),
+                new ChunkColumn(1, -1)
+        };
+        for (final ChunkColumn chunkColumn : chunkColumns) {
+            final ChunkDataPacketOut packetOut = new ChunkDataPacketOut(true, chunkColumn);
+            session.sendPacket(packetOut);
+        }
     }
 
 }

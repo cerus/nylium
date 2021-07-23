@@ -5,7 +5,7 @@ import dev.cerus.nylium.event.Subscribe;
 import dev.cerus.nylium.event.implementation.PacketProcessEvent;
 import dev.cerus.nylium.event.implementation.PacketReceivedEvent;
 import dev.cerus.nylium.event.implementation.PluginMessageReceivedEvent;
-import dev.cerus.nylium.io.packet.implementation.PluginMessagePacketIn;
+import dev.cerus.nylium.io.packet.implementation.in.PluginMessagePacketIn;
 import dev.cerus.nylium.io.session.PlayerSession;
 import dev.cerus.nylium.server.key.MinecraftKeys;
 import dev.cerus.nylium.server.key.NamespacedKey;

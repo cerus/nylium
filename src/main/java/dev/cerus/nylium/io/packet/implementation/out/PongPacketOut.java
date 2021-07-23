@@ -1,23 +1,23 @@
-package dev.cerus.nylium.io.packet.implementation;
+package dev.cerus.nylium.io.packet.implementation.out;
 
 import dev.cerus.nylium.io.IOUtils;
 import dev.cerus.nylium.io.packet.PacketOut;
 import io.netty.buffer.ByteBuf;
 
 /**
- * 0x21 https://wiki.vg/Protocol#Keep_Alive_.28clientbound.29
+ * 0x01 https://wiki.vg/Server_List_Ping#Pong
  */
-public class KeepAlivePacketOut extends PacketOut {
+public class PongPacketOut extends PacketOut {
 
     private final long identifier;
 
-    public KeepAlivePacketOut(final long identifier) {
+    public PongPacketOut(final long identifier) {
         this.identifier = identifier;
     }
 
     @Override
     public void write(final ByteBuf byteBuf) {
-        IOUtils.writeVarInt(byteBuf, 0x21);
+        IOUtils.writeVarInt(byteBuf, 0x01);
         byteBuf.writeLong(this.identifier);
     }
 

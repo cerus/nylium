@@ -3,8 +3,10 @@ package dev.cerus.nylium.io;
 import dev.cerus.simplenbt.tag.SimpleNbtUtil;
 import dev.cerus.simplenbt.tag.Tag;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
@@ -53,11 +55,20 @@ public class IOUtils {
     }
 
     /**
-     * Writes a var int to a buffer
+     * Writes a var int to a stream
      *
-     * @param byteBuffer The buffer
-     * @param value      The var int
+     * @param outputStream The stream
+     * @param value        The var int
      */
+    public static void writeVarInt(final OutputStream outputStream, final int value) throws IOException {
+        final ByteBuf buffer = Unpooled.buffer();
+        writeVarInt(buffer, value);
+        while (buffer.readableBytes() > 0) {
+            outputStream.write(buffer.readByte());
+        }
+        buffer.release();
+    }
+
     public static void writeVarInt(final ByteBuf byteBuffer, int value) {
         do {
             byte currentByte = (byte) (value & 0b01111111);

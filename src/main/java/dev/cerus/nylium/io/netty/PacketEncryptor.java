@@ -3,7 +3,6 @@ package dev.cerus.nylium.io.netty;
 import dev.cerus.nylium.io.session.PlayerSession;
 import dev.cerus.nylium.io.session.PlayerSessionController;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 import java.util.List;
@@ -42,7 +41,7 @@ public class PacketEncryptor extends ByteToMessageCodec<ByteBuf> {
             buffer.writerIndex(session.getEncryptionContainer().decryptCommon(inBytes, 0, inBytes.length, buffer.array(), buffer.arrayOffset()));
             out.add(buffer);
         } else {
-            final ByteBuf outBuf = Unpooled.buffer();
+            final ByteBuf outBuf = ctx.alloc().heapBuffer();
             outBuf.writeBytes(in.readBytes(in.readableBytes()));
             out.add(outBuf);
         }

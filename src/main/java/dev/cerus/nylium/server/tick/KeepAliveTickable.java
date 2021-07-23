@@ -3,7 +3,7 @@ package dev.cerus.nylium.server.tick;
 import dev.cerus.nylium.event.Subscribe;
 import dev.cerus.nylium.event.implementation.PacketReceivedEvent;
 import dev.cerus.nylium.event.implementation.SessionRemovedEvent;
-import dev.cerus.nylium.io.packet.implementation.KeepAlivePacketOut;
+import dev.cerus.nylium.io.packet.implementation.out.KeepAlivePacketOut;
 import dev.cerus.nylium.io.session.PlayerSession;
 import dev.cerus.nylium.io.session.PlayerSessionController;
 import dev.cerus.nylium.server.NyliumTicker;

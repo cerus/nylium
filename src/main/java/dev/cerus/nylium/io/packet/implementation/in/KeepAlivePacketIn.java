@@ -1,4 +1,4 @@
-package dev.cerus.nylium.io.packet.implementation;
+package dev.cerus.nylium.io.packet.implementation.in;
 
 import dev.cerus.nylium.io.packet.PacketIn;
 import io.netty.buffer.ByteBuf;
